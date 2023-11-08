@@ -1,6 +1,6 @@
 # kktool
 
-kktool is a project that provides some command utils for everyday work.
+kktool is a project that provides some common utils for everyday work.
 
 # Installation
 
