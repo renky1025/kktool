@@ -8,6 +8,10 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
 	"log"
 	"math/rand"
@@ -20,6 +24,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/chai2010/webp"
 	"github.com/mitchellh/mapstructure"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/text/encoding/simplifiedchinese"
@@ -391,4 +396,62 @@ func MD5sum(filename string) (string, error) {
 
 	checksum := fmt.Sprintf("%x", hash.Sum(nil))
 	return checksum, nil
+}
+
+// ImageBytes2WebpBytes 将图片转为webp
+// inputFile 图片字节切片（仅限gif,jpeg,png格式）
+// outputFile webp图片字节切片
+// 图片质量
+func ImageBytes2WebpBytes(input []byte, quality float32) ([]byte, error) {
+
+	//解析图片
+	img, format, err := image.Decode(bytes.NewBuffer(input))
+	if err != nil {
+		log.Println("图片解析失败")
+		return nil, err
+	}
+
+	log.Println("原始图片格式：", format)
+
+	//转为webp
+	webpBytes, err := webp.EncodeRGBA(img, quality)
+
+	if err != nil {
+		log.Println("解析图片失败", err)
+		return nil, err
+	}
+
+	return webpBytes, nil
+}
+
+// Image2Webp 将图片转为webp
+// inputFile 图片路径（仅限gif,jpeg,png格式）
+// outputFile 图片输出路径
+// 图片质量
+func Image2Webp(inputFile string, outputFile string, quality float32) error {
+
+	// 读取文件
+	fileBytes, err := os.ReadFile(inputFile)
+	if err != nil {
+		log.Println("读取文件失败:", err)
+		return err
+	}
+
+	webpBytes, err := ImageBytes2WebpBytes(fileBytes, quality)
+
+	if err != nil {
+		log.Println("解析图片失败", err)
+		return err
+	}
+
+	if err = os.WriteFile(outputFile, webpBytes, 0666); err != nil {
+		log.Println("图片写入失败", err)
+		return err
+	}
+
+	originalSize := len(fileBytes)
+	webpSize := len(webpBytes)
+	log.Printf("原始大小:%d k,转换后大小:%d k,压缩比:%d %% \n", originalSize/1024, webpSize/1024, webpSize*100/originalSize)
+
+	return nil
 }

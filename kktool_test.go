@@ -1,7 +1,9 @@
 package kktool
 
 import (
+	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -22,4 +24,11 @@ func TestHideStar(t *testing.T) {
 	target := "136****6666"
 	fmt.Println(res)
 	assert.Equal(t, target, res)
+}
+
+func TestImage2Webp(t *testing.T) {
+	Image2Webp("./images/Gitlab.jpeg", "./images/Gitlab.webp", 0.8)
+	_, err := os.Stat("./images/Gitlab.webp")
+	res := errors.Is(err, os.ErrNotExist)
+	assert.True(t, res == false)
 }

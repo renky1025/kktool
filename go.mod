@@ -3,6 +3,7 @@ module github.com/renky1025/kktool
 go 1.20
 
 require (
+	github.com/chai2010/webp v1.1.1
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/crypto v0.14.0
